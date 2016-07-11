@@ -39,5 +39,43 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    // Make sure the command type
+    Not(in=instruction[15], out=isAcmd);
+    Not(in=isAcmd, out=isCcmd);
+
+    // -- ALU --
+    // instruction[12] is 'a' bit, it determines 
+    Mux16(a=regOutA, b=inM, sel=instruction[12], out=mux16OutAM);
+    // instruction[11..6] is 'c1 .. c6', which determine the function that ALU performs.
+    ALU(x=regOutD ,y=mux16OutAM ,zx=instruction[11] ,nx=instruction[10] ,zy=instruction[9] ,ny=instruction[8] ,f=instruction[7] ,no=instruction[6] , out=outM, out=outALU ,zr=zr ,ng=ng ); 
+    And(a=isCcmd, b=instruction[3], out=writeM);
+
+    // -- A Register --
+    // write to A register if (isAcmd || instruction[5]), instruction[5] is d1
+    Or(a=isAcmd, b=instruction[5], out=loadA);
+    Mux16(a=outALU ,b=instruction ,sel=isAcmd ,out=mux16OutA);
+    ARegister(in=mux16OutA ,load=loadA ,out=regOutA, out[0..14]=addressM);
+
+    // -- D Register --
+    // write to A register if (isCcmd || instruction[4]), instruction[4] is d2
+    And(a=isCcmd, b=instruction[4], out=loadD);
+    DRegister(in=outALU ,load=loadD ,out=regOutD );
+
+    // -- Program Counter --
+    //  if      (jump[t]) pc[t] = A(t-1)
+    //  else              pc[t] = pc[t-1] + 1
+    // Also need to check the 'jbits' and ALU status out for jump operation
+    // jbits are instruction[0..2]
+    Not(in=ng, out=ge); // output >= 0
+    Not(in=zr, out=nz); // output != 0
+    And(a=ge, b=nz, out=pos); // output > 0
+
+    And(a=instruction[0], b=pos, out=JGT);
+    And(a=instruction[1], b=zr, out=JEQ);
+    And(a=instruction[2], b=ng, out=JLT);
+
+    Or(a=JGT, b=JEQ, out=JGTorJEQorJGE);
+    Or(a=JGTorJEQorJGE, b=JLT, out=allJump);
+    And(a=isCcmd, b=allJump, out=loadJump);
+    PC(in=regOutA ,load=loadJump ,inc=true ,reset=reset ,out[0..14]=pc );	
 }

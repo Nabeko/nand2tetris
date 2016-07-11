@@ -27,5 +27,18 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    // set up 3 memory chip, RAM16K, Keyboard, and Screen
+    RAM16K(in=in ,load=loadRAM ,address=address[0..13] ,out=ram16kout );
+    Keyboard(out=keyboardout);
+    Screen(in=in ,load=loadScreen ,address=address[0..12] ,out=screenout );
+
+    // Dmux to perform the write operation
+    // RAM16K address length is 14, so if ( MSB == 0 ) select RAM16K; else select others
+    DMux(in=load, sel=address[14], a=loadRAM, b=loadothers);
+    // Screen address length is 13, so if ( MSB == 0 ) select Screen; else select Keyboard
+    DMux(in=loadothers, sel=address[13], a=loadScreen, b=loadKeyboard);
+
+    // Mux16 to execute the read operation
+    Mux16(a=screenout ,b=keyboardout ,sel=address[13] ,out=otherout);
+    Mux16(a=ram16kout ,b=otherout ,sel=address[14] ,out=out);
 }
