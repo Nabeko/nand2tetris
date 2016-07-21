@@ -57,20 +57,20 @@ static SymbolicToBinary compMap[] = {
    {"D|M" , "1010101"}
 };
 
-static char *codeMapping(int type, char* symbol){
+static char *CodeMapping(int type, char* symbol){
   int i, count = 0;
   SymbolicToBinary *table = NULL;
 
   switch(type){
-	case DEST:
+    case DEST:
       count = sizeof(destMap) / sizeof(SymbolicToBinary);
       table = destMap;
       break;
-	case COMP:
+    case COMP:
       count = sizeof(compMap) / sizeof(SymbolicToBinary);
       table = compMap;
       break;
-	case JUMP:
+    case JUMP:
       count = sizeof(jumpMap) / sizeof(SymbolicToBinary);
       table = jumpMap;
       break;
@@ -86,14 +86,14 @@ static char *codeMapping(int type, char* symbol){
   return NULL;
 }
 
-char *dest(char* hackDest){
-  return codeMapping(DEST , hackDest);
+char *Dest(char* hackDest){
+  return CodeMapping(DEST , hackDest);
 }
 
-char *comp(char* hackComp){
-  return codeMapping(COMP , hackComp);
+char *Comp(char* hackComp){
+  return CodeMapping(COMP , hackComp);
 }
 
-char *jump(char* hackJump){
-  return codeMapping(JUMP , hackJump);
+char *Jump(char* hackJump){
+  return CodeMapping(JUMP , hackJump);
 }

@@ -10,8 +10,8 @@ typedef struct SymbolicToBinary{
   char* binary;
 } SymbolicToBinary;
 
-char *dest(char*);
-char *comp(char*);
-char *jump(char*);
+char *Dest(char*);
+char *Comp(char*);
+char *Jump(char*);
 
 #endif /* __CODE_H__ */

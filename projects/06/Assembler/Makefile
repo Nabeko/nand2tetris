@@ -1,5 +1,5 @@
 CC := gcc
-OBJS := main.o parser.o code.o
+OBJS := main.o parser.o code.o symboltable.o
 TARGET := HackAssembler
 
 HackAssembler:$(OBJS)

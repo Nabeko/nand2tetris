@@ -36,33 +36,46 @@ static char *RemoveComments(char *str)
   return str;
 }
 
-int parse(FILE *asmFile, Instruction **instructions)
+static int IsDecimalOnly(const char *str)
+{
+  while(*str) {
+    if (isdigit(*str++) == 0) return 0;
+  }
+
+  return -1;
+}
+
+int Parse(FILE *asmFile, Instruction **instructions, SymbolTable **symbolTables)
 {
   char buf[128]; // buffer for each line
   char *temp = NULL; // temp for the each instruction
   char *symbol = NULL; // symbol address for C command
   int count=0; // count of instructions
+  int i; // array index
   Instruction *currentInstruction = NULL;
 
-  // allocate memory for instructions array
-  *instructions = (Instruction*)malloc(sizeof(Instruction));
-
-  while(!feof(asmFile)) {
-    if(fgets(buf,128,asmFile)!=NULL) {
+  while(!feof(asmFile)) { // hasMoreCommands
+    if(fgets(buf,128,asmFile)!=NULL) { // advance
       // remove the comments and white space on each line
       temp = TrimWhitespace(RemoveComments(buf));
       // if *temp is 0, it must be a space line 
       if(*temp != 0) {
-        // change the instructions array dynamically 
-        if (count > 0) {
-          *instructions = (Instruction*)realloc(*instructions, (count+1)*sizeof(Instruction));
+        if(*temp == '(') { // Label
+          symbol = temp + 1;
+		  symbol[strcspn(symbol,")")] = '\0';
+          AddEntry(symbol, count, symbolTables); // Add Label to Symbol Table
+          continue;
         }
 
         currentInstruction = *instructions+count;
-		memset (currentInstruction,0,sizeof(Instruction));
-        if(*temp == '@') { // A Command
-          currentInstruction->commandType = A_COMMAND;
+		memset(currentInstruction, 0, sizeof(Instruction));
+        if(*temp == '@') { // A Command or L COMMAND
           strcpy(currentInstruction->symbol, temp+1);
+          if(IsDecimalOnly(currentInstruction->symbol)) {
+            currentInstruction->commandType = A_COMMAND;
+          } else {
+            currentInstruction->commandType = L_COMMAND;
+          }
         } else { // C Command dest=comp;jump
           currentInstruction->commandType = C_COMMAND;
 
@@ -85,6 +98,14 @@ int parse(FILE *asmFile, Instruction **instructions)
         }
         count++;
       }
+    }
+  }
+
+  // Add variables to symbol table
+  for( i = 0; i < count; i++ ){
+    currentInstruction = *instructions + i;
+    if( currentInstruction->commandType == L_COMMAND ){
+      AddEntry(currentInstruction->symbol, VARIABLE, symbolTables);
     }
   }
 
