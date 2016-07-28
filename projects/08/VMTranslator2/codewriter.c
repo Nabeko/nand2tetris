@@ -392,9 +392,11 @@ static void ResetCallerVariable(FILE* fp, int offset, char* FRAME, char* segment
 
 void WriteReturn(FILE* fp)
 {
-  // set temporary variables, temp is started on R5
-  char* FRAME = "R5";
-  char* RET = "R6";
+  // set temporary variables,
+  // according to document, if we run out of registers,
+  // we shoud use R13, R14, and R15.
+  char* FRAME = "R13";
+  char* RET = "R14";
   int i;
 
   // FRAME = LCL
