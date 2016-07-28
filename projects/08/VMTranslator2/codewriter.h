@@ -8,11 +8,20 @@
 #define ASM_EXTENSION ".asm"
 
 char *CheckFileExtension(char *);
-char *CreateOutfile(char *);
-FILE* SetFileName(char*);
-void WriteArithmetic(FILE*, char*);
-void WritePushPop(FILE*, short, char*, int);
+
+FILE* Open(char*, char*);
 void Close(FILE*);
+
+void SetFileName(char*);
+void WriteInit(FILE*);
+void WriteArithmetic(FILE*, char*);
+void WriteLabel(FILE*, char*);
+void WriteGoTo(FILE*, char*);
+void WriteIf(FILE*, char*);
+void WritePushPop(FILE*, short, char*, int);
+void WriteFunction(FILE*, char*, int);
+void WriteCall(FILE*, char*, int);
+void WriteReturn(FILE*);
 
 typedef struct opMapping{
   char op[16];

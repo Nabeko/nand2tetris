@@ -21,7 +21,7 @@
 
 typedef struct command{
   short commandType;
-  char arg1[8];
+  char arg1[32];
   long arg2;
 } Command;
 
