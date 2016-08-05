@@ -29,7 +29,7 @@ static char *CreateOutfile(char *str)
 
   // if found, replace it with XML_EXTENSION
   if(end)
-  	strcpy(end, XML_EXTENSION);
+     strcpy(end, XML_EXTENSION);
 
    return str;
 }
@@ -43,7 +43,7 @@ static char *CreateTokenOutfile(char *str)
 
   // if found, replace it with TOKEN_XML_EXTENSION
   if(end)
-  	strcpy(end, TOKEN_XML_EXTENSION);
+     strcpy(end, TOKEN_XML_EXTENSION);
 
    return str;
 }
@@ -111,9 +111,9 @@ int main(int argc, char* argv[])
         if(!outP) {
            printf("Output file open failed!\n");
            outP = stdout;
-	    }
+        }
         CompileClass(outP, &jackTokens, count);
-	    fclose(outP);
+        fclose(outP);
     }
   }
   closedir(pDir);
@@ -122,7 +122,6 @@ int main(int argc, char* argv[])
   // Handle single jack file
   if (fileName != NULL) {
     // open the input file
-	printf("%s\n", fileName);
     inP = fopen(fileName, "r");
     if(!inP) {
       printf("File '%s' open failed!\n", fileName);
@@ -138,8 +137,8 @@ int main(int argc, char* argv[])
     if(!outTokenP) {
        printf("Output token file open failed!\n");
        outTokenP = stdout;
-	}
-	JackTokenOutput(outTokenP, &jackTokens, count);
+    }
+    JackTokenOutput(outTokenP, &jackTokens, count);
     fclose(outTokenP);
 
     // handle output file
@@ -147,10 +146,9 @@ int main(int argc, char* argv[])
     if(!outP) {
        printf("Output file open failed!\n");
        outP = stdout;
-	}
+    }
     CompileClass(outP, &jackTokens, count);
-	fclose(outP);
-	CompileClass(stdout, &jackTokens, count);
+    fclose(outP);
   }
 
 failed:
