@@ -1,6 +1,6 @@
 CC := gcc
-OBJS := main.o jacktokenizer.o compilationengine.o
-TARGET := JackAnalyzer
+OBJS := main.o jacktokenizer.o compilationengine.o symboltable.o vmwriter.o
+TARGET := JackCompiler
 
 $(TARGET):$(OBJS)
 	$(CC) $^ -o $@

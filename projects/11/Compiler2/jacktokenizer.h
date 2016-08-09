@@ -10,7 +10,6 @@
 #define IDENTIFIER          2
 #define INT_CONST           3
 #define STRING_CONST        4
-#define NONE               -1
 
 
 typedef struct token{

@@ -4,49 +4,7 @@
 #include <libgen.h>
 #include "jacktokenizer.h"
 #include "compilationengine.h"
-
-#define JACK_EXTENSION        ".jack"
-#define XML_EXTENSION         ".xml"
-#define TOKEN_XML_EXTENSION   "T.xml"
-
-static char *CheckFileExtension(char *str, char *extension)
-{
-  char *end;
-
-  // Find the extension
-  end = strstr(str, extension);
-
-  // if found, return the extension start pointer
-  return end;
-}
-
-static char *CreateOutfile(char *str)
-{
-  char *end;
-
-  // get TOKEN_XML_EXTENSION pos
-  end = CheckFileExtension(str, TOKEN_XML_EXTENSION);
-
-  // if found, replace it with XML_EXTENSION
-  if(end)
-  	strcpy(end, XML_EXTENSION);
-
-   return str;
-}
-
-static char *CreateTokenOutfile(char *str)
-{
-  char *end;
-
-  // get JACK_EXTENSION pos
-  end = CheckFileExtension(str, JACK_EXTENSION);
-
-  // if found, replace it with TOKEN_XML_EXTENSION
-  if(end)
-  	strcpy(end, TOKEN_XML_EXTENSION);
-
-   return str;
-}
+#include "vmwriter.h"
 
 int main(int argc, char* argv[])
 {
@@ -56,14 +14,14 @@ int main(int argc, char* argv[])
   char *fileName = NULL;
   char inputFilename[128];
 
-  FILE *inP, *outTokenP, *outP; // input and output file
+  FILE *inP; // input file
   Token *jackTokens; // all Jack Tokens
   int count=0; // count of instructions
   int i; // loop index
   Token *currentToken = NULL;
   
   if(argc != 2) {
-    printf("Usage : JackAnalyzer <directory | jack file >");
+    printf("Usage : JackCompiler <directory | jack file >");
     return -1;
   }
   
@@ -97,23 +55,7 @@ int main(int argc, char* argv[])
         count = JackTokenizer(inP, &jackTokens);
         fclose(inP);
 
-        // handle token output file
-        outTokenP = fopen(CreateTokenOutfile(inputFilename), "w+");
-        if(!outTokenP) {
-           printf("Output token file open failed!\n");
-           outTokenP = stdout;
-        }
-        JackTokenOutput(outTokenP, &jackTokens, count);
-        fclose(outTokenP);
-
-        // handle output file
-        outP = fopen(CreateOutfile(inputFilename), "w+");
-        if(!outP) {
-           printf("Output file open failed!\n");
-           outP = stdout;
-	    }
-        CompileClass(outP, &jackTokens, count);
-	    fclose(outP);
+        CompileClass(inputFilename, &jackTokens, count);
     }
   }
   closedir(pDir);
@@ -122,7 +64,6 @@ int main(int argc, char* argv[])
   // Handle single jack file
   if (fileName != NULL) {
     // open the input file
-	printf("%s\n", fileName);
     inP = fopen(fileName, "r");
     if(!inP) {
       printf("File '%s' open failed!\n", fileName);
@@ -133,24 +74,7 @@ int main(int argc, char* argv[])
     count = JackTokenizer(inP, &jackTokens);
     fclose(inP);
 
-    // handle token output file
-    outTokenP = fopen(CreateTokenOutfile(fileName), "w+");
-    if(!outTokenP) {
-       printf("Output token file open failed!\n");
-       outTokenP = stdout;
-	}
-	JackTokenOutput(outTokenP, &jackTokens, count);
-    fclose(outTokenP);
-
-    // handle output file
-    outP = fopen(CreateOutfile(fileName), "w+");
-    if(!outP) {
-       printf("Output file open failed!\n");
-       outP = stdout;
-	}
-    CompileClass(outP, &jackTokens, count);
-	fclose(outP);
-	CompileClass(stdout, &jackTokens, count);
+    CompileClass(fileName, &jackTokens, count);
   }
 
 failed:

@@ -4,13 +4,10 @@
 #include <stdio.h>
 #include "jacktokenizer.h"
 
-#define TRUE   0
-#define FALSE -1
-
 typedef struct statementMapping{
   char statement[8];
-  void (*statementFunction)(FILE*, Token **, int *, int *, int);
+  void (*statementFunction)(FILE*, Token**, int*, int, char*);
 } StatementMapping;
 
-void CompileClass(FILE*, Token **, int);
+void CompileClass(char*, Token **, int);
 #endif /* __COMPILATION_ENGINE_H__ */
